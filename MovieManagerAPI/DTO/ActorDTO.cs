@@ -14,6 +14,6 @@ namespace MovieManagerAPI.DTO
         [StringLength(120)]
         public string Nombre { get; set; }
         public DateTime FechaNacimiento { get; set; }
-        public IFormFile Foto { get; set; } //aunque la entidad reciba una url, aquí en cambio devolvería un archivo
+        public string Foto { get; set; } //aunque la entidad reciba una url, aquí en cambio devolvería un archivo
     }
 }

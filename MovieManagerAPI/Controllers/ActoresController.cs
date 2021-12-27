@@ -42,7 +42,7 @@ namespace MovieManagerAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] ActorCreacionDTO actorCreacionDTO)
+        public async Task<ActionResult> Post([FromForm] ActorCreacionDTO actorCreacionDTO)
         {
             var actor = mapper.Map<Actor>(actorCreacionDTO);
             await context.Actores.AddAsync(actor);
