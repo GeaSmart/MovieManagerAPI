@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieManagerAPI.DTO;
@@ -88,6 +89,31 @@ namespace MovieManagerAPI.Controllers
                     actor.Foto = await almacenadorArchivos.EditarArchivo(contenido, extension, contenedor, actor.Foto, actorCreacionDTO.Foto.ContentType);
                 }
             }
+
+            await context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpPatch("{id:int}")]
+        public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<ActorPatchDTO> patchDocument)
+        {
+            if (patchDocument == null)
+                return BadRequest();
+
+            var actor = await context.Actores.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (actor == null)
+                return NotFound();
+
+            var actorDTO = mapper.Map<ActorPatchDTO>(actor);
+
+            patchDocument.ApplyTo(actorDTO, ModelState);
+
+            var esValido = TryValidateModel(actorDTO);
+            if (!esValido)
+                return BadRequest(ModelState);
+
+            mapper.Map(actorDTO, actor);
 
             await context.SaveChangesAsync();
             return NoContent();
