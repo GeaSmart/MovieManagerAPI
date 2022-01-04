@@ -30,6 +30,8 @@ namespace MovieManagerAPI
             services.AddAutoMapper(typeof(Startup));
 
             services.AddTransient<IAlmacenadorArchivos, AlmacenadorArchivosAzure>();
+            //services.AddTransient<IAlmacenadorArchivos, AlmacenadorArchivosLocal>();
+            //services.AddHttpContextAccessor();
 
             services.AddDbContext<ApplicationDBContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"))
@@ -47,6 +49,8 @@ namespace MovieManagerAPI
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
 
             app.UseRouting();
 
