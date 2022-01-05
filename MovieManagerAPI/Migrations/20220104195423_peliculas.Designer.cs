@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieManagerAPI;
 
 namespace MovieManagerAPI.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20220104195423_peliculas")]
+    partial class peliculas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,80 +85,6 @@ namespace MovieManagerAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Peliculas");
-                });
-
-            modelBuilder.Entity("MovieManagerAPI.Entidades.PeliculasActores", b =>
-                {
-                    b.Property<int>("PeliculaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ActorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Orden")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Personaje")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PeliculaId", "ActorId");
-
-                    b.HasIndex("ActorId");
-
-                    b.ToTable("PeliculasActores");
-                });
-
-            modelBuilder.Entity("MovieManagerAPI.Entidades.PeliculasGeneros", b =>
-                {
-                    b.Property<int>("PeliculaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GeneroId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PeliculaId", "GeneroId");
-
-                    b.HasIndex("GeneroId");
-
-                    b.ToTable("PeliculasGeneros");
-                });
-
-            modelBuilder.Entity("MovieManagerAPI.Entidades.PeliculasActores", b =>
-                {
-                    b.HasOne("MovieManagerAPI.Entidades.Actor", "Actor")
-                        .WithMany()
-                        .HasForeignKey("ActorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MovieManagerAPI.Entidades.Pelicula", "Pelicula")
-                        .WithMany()
-                        .HasForeignKey("PeliculaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Actor");
-
-                    b.Navigation("Pelicula");
-                });
-
-            modelBuilder.Entity("MovieManagerAPI.Entidades.PeliculasGeneros", b =>
-                {
-                    b.HasOne("MovieManagerAPI.Entidades.Genero", "Genero")
-                        .WithMany()
-                        .HasForeignKey("GeneroId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MovieManagerAPI.Entidades.Pelicula", "Pelicula")
-                        .WithMany()
-                        .HasForeignKey("PeliculaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Genero");
-
-                    b.Navigation("Pelicula");
                 });
 #pragma warning restore 612, 618
         }
