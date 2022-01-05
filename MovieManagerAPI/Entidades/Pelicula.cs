@@ -15,5 +15,9 @@ namespace MovieManagerAPI.Entidades
         public bool EnCines { get; set; }
         public DateTime FechaEstreno { get; set; }
         public string Poster { get; set; }
+
+        //Propiedades de navegación
+        public List<PeliculasGeneros> PeliculasGeneros { get; set; }
+        public List<PeliculasActores> PeliculasActores { get; set; }
     }
 }

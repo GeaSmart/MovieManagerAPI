@@ -14,5 +14,8 @@ namespace MovieManagerAPI.Entidades
         public string Nombre { get; set; }
         public DateTime FechaNacimiento { get; set; }
         public string Foto { get; set; } //aquí irá la url, no el archivo
+
+        //propiedades de navegación
+        public List<PeliculasActores> PeliculasActores { get; set; }
     }
 }

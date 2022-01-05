@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using MovieManagerAPI.Helpers;
 using MovieManagerAPI.Validaciones;
 using System;
 using System.Collections.Generic;
@@ -18,5 +20,9 @@ namespace MovieManagerAPI.DTO
         [PesoArchivoValidacion(4)]
         [TipoArchivoValidacion(GrupoTipoArchivo.Imagen)]
         public IFormFile Poster { get; set; }
+        [ModelBinder(binderType: typeof(TypeBinder<List<int>>))]
+        public List<int> GenerosIDs { get; set; }
+        [ModelBinder(binderType: typeof(TypeBinder<List<PeliculasActoresCreacionDTO>>))]
+        public List<PeliculasActoresCreacionDTO> Actores { get; set; }
     }
 }
