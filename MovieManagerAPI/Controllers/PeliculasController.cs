@@ -61,7 +61,7 @@ namespace MovieManagerAPI.Controllers
                     pelicula.Poster = await almacenadorArchivos.GuardarArchivo(contenido, extension, contenedor, peliculaCreacionDTO.Poster.ContentType);
                 }
             }
-
+            AsignarOrdenActores(pelicula);
             await context.Peliculas.AddAsync(pelicula);
             await context.SaveChangesAsync();
 
@@ -69,15 +69,29 @@ namespace MovieManagerAPI.Controllers
             return new CreatedAtRouteResult("obtenerPelicula", new { id = pelicula.Id }, peliculaDTO);
         }
 
+        private void AsignarOrdenActores(Pelicula pelicula)
+        {
+            if(pelicula.PeliculasActores != null)
+            {
+                for(int i = 0; i < pelicula.PeliculasActores.Count; i++)
+                {
+                    pelicula.PeliculasActores[i].Orden = i;
+                }
+            }
+        }
+
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromForm] PeliculaCreacionDTO peliculaCreacionDTO)
         {
-            var existe = await context.Peliculas.AnyAsync(x => x.Id == id);
-            if (!existe)
+            var pelicula = await context.Peliculas
+                .Include(x=>x.PeliculasActores)
+                .Include(x=>x.PeliculasGeneros)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (pelicula == null)
                 return NotFound();
 
-            var pelicula = mapper.Map<Pelicula>(peliculaCreacionDTO);
-            pelicula.Id = id;
+            pelicula = mapper.Map<Pelicula>(peliculaCreacionDTO);            
 
             if (peliculaCreacionDTO.Poster != null)
             {
@@ -89,7 +103,7 @@ namespace MovieManagerAPI.Controllers
                     pelicula.Poster = await almacenadorArchivos.EditarArchivo(contenido, extension, contenedor, pelicula.Poster, peliculaCreacionDTO.Poster.ContentType);
                 }
             }
-
+            AsignarOrdenActores(pelicula);
             context.Peliculas.Update(pelicula);
             await context.SaveChangesAsync();
 
