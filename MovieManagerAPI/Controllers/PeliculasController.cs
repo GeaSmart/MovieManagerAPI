@@ -91,7 +91,8 @@ namespace MovieManagerAPI.Controllers
             if (pelicula == null)
                 return NotFound();
 
-            pelicula = mapper.Map<Pelicula>(peliculaCreacionDTO);            
+            pelicula = mapper.Map(peliculaCreacionDTO, pelicula);
+            pelicula.Id = id;
 
             if (peliculaCreacionDTO.Poster != null)
             {
