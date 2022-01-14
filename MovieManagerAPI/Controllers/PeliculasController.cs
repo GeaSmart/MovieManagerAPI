@@ -83,7 +83,10 @@ namespace MovieManagerAPI.Controllers
         [HttpGet("{id:int}", Name = "obtenerPelicula")]
         public async Task<ActionResult<PeliculaDTO>> Get(int id)
         {
-            var pelicula = await context.Peliculas.FirstOrDefaultAsync(x => x.Id == id);
+            var pelicula = await context.Peliculas
+                .Include(x => x.PeliculasGeneros).ThenInclude(y => y.Genero) //trayendo data relacionada de géneros
+                .Include(x => x.PeliculasActores).ThenInclude(y => y.Actor) //trayendo data relacionada de actores
+                .FirstOrDefaultAsync(x => x.Id == id);
             if (pelicula == null)
                 return NotFound();
 
