@@ -26,7 +26,35 @@ namespace MovieManagerAPI.Helpers
                 .ForMember(x => x.PeliculasGeneros, options => options.MapFrom(MapPeliculasGeneros))
                 .ForMember(x => x.PeliculasActores, options => options.MapFrom(MapPeliculasActores));
 
+            CreateMap<Pelicula, PeliculaDetallesDTO>()
+                .ForMember(x=>x.Generos,options=>options.MapFrom(MapPeliculasGeneros))
+                .ForMember(x=>x.Actores, options =>options.MapFrom(MapPeliculasActores));
+
             CreateMap<Pelicula, PeliculaPatchDTO>().ReverseMap();
+        }
+
+        private List<GeneroDTO> MapPeliculasGeneros(Pelicula pelicula, PeliculaDetallesDTO peliculaDetallesDTO)
+        {
+            var resultado = new List<GeneroDTO>();
+            if (pelicula.PeliculasGeneros == null)
+                return resultado;
+
+            foreach (var item in pelicula.PeliculasGeneros)
+                resultado.Add(new GeneroDTO { Id = item.GeneroId, Nombre = item.Genero.Nombre });
+            
+            return resultado;
+        }
+
+        private List<ActorPeliculaDetalleDTO> MapPeliculasActores(Pelicula pelicula, PeliculaDetallesDTO peliculaDetallesDTO)
+        {
+            var resultado = new List<ActorPeliculaDetalleDTO>();
+            if (pelicula.PeliculasActores == null)
+                return resultado;
+
+            foreach (var item in pelicula.PeliculasActores)
+                resultado.Add(new ActorPeliculaDetalleDTO{ ActorId = item.ActorId, Persona = item.Actor.Nombre, Personaje = item.Personaje });
+
+            return resultado;
         }
 
         private List<PeliculasGeneros> MapPeliculasGeneros(PeliculaCreacionDTO peliculaCreacionDTO, Pelicula pelicula)
