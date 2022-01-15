@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
+using Microsoft.Extensions.Logging;
 
 namespace MovieManagerAPI.Controllers
 {
@@ -21,13 +23,15 @@ namespace MovieManagerAPI.Controllers
         private readonly ApplicationDBContext context;
         private readonly IMapper mapper;
         private readonly IAlmacenadorArchivos almacenadorArchivos;
+        private readonly ILogger<PeliculasController> logger;
         private readonly string contenedor = "peliculas";
 
-        public PeliculasController(ApplicationDBContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos)
+        public PeliculasController(ApplicationDBContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos,ILogger<PeliculasController> logger)
         {
             this.context = context;
             this.mapper = mapper;
             this.almacenadorArchivos = almacenadorArchivos;
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -73,6 +77,21 @@ namespace MovieManagerAPI.Controllers
             if (peliculasFiltroDTO.GeneroId != 0)
                 peliculasQueryable = peliculasQueryable.Where(x => x.PeliculasGeneros.Select(y => y.GeneroId).Contains(peliculasFiltroDTO.GeneroId));
 
+            //ordenamiento
+            if (!string.IsNullOrEmpty(peliculasFiltroDTO.CampoOrdenar))
+            {
+                var tipoOrden = peliculasFiltroDTO.IsAscendente ? "ascending" : "descending";
+                try
+                {
+                    peliculasQueryable = peliculasQueryable.OrderBy($"{peliculasFiltroDTO.CampoOrdenar} {tipoOrden}");
+                }
+                catch(Exception ex)
+                {
+                    logger.LogError(ex.Message, ex);
+                }
+                
+            }
+            
             await HttpContext.InsertarParametrosPaginacion(peliculasQueryable, peliculasFiltroDTO.CantidadRegistrosPorPagina);
 
             var peliculas = await peliculasQueryable.Paginar(peliculasFiltroDTO.Paginacion).ToListAsync();

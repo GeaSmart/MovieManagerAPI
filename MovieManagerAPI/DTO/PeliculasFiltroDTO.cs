@@ -19,5 +19,7 @@ namespace MovieManagerAPI.DTO
         public int GeneroId { get; set; }
         public bool EnCines { get; set; }
         public bool ProximosEstrenos { get; set; }
+        public string CampoOrdenar { get; set; }
+        public bool IsAscendente { get; set; } = true;
     }
 }
