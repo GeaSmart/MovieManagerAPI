@@ -12,12 +12,12 @@ namespace MovieManagerAPI.Controllers
 {
     [ApiController]
     [Route("api/{controller}")]
-    public class GenerosController:ControllerBase
+    public class GenerosController:CustomBaseController //ControllerBase
     {
         private readonly ApplicationDBContext context;
         private readonly IMapper mapper;
 
-        public GenerosController(ApplicationDBContext context, IMapper mapper)
+        public GenerosController(ApplicationDBContext context, IMapper mapper) : base(context, mapper)
         {
             this.context = context;
             this.mapper = mapper;
@@ -26,8 +26,9 @@ namespace MovieManagerAPI.Controllers
         [HttpGet]
         public async Task<List<GeneroDTO>> Get()
         {
-            var generos = await context.Generos.ToListAsync();
-            return mapper.Map<List<GeneroDTO>>(generos);
+            //var generos = await context.Generos.ToListAsync();
+            //return mapper.Map<List<GeneroDTO>>(generos);
+            return await Get<Genero, GeneroDTO>();
         }
 
         [HttpGet("{id:int}", Name = "obtenerGenero")]

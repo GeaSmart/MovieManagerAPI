@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,11 @@ namespace MovieManagerAPI.Controllers
             this.mapper = mapper;
         }
 
+        protected async Task<List<TDTO>> Get<TEntidad, TDTO>() where TEntidad : class
+        {
+            var entidades = await context.Set<TEntidad>().AsNoTracking().ToListAsync();//AsNoTracking hace que nuestros querys sean más rápidos
+            return mapper.Map<List<TDTO>>(entidades);
+        }
 
     }
 }
