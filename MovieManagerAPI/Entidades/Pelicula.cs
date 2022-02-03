@@ -19,5 +19,6 @@ namespace MovieManagerAPI.Entidades
         //Propiedades de navegación
         public List<PeliculasGeneros> PeliculasGeneros { get; set; }
         public List<PeliculasActores> PeliculasActores { get; set; }
+        public List<PeliculasSalasDeCine> PeliculasSalasDeCines { get; set; }
     }
 }
