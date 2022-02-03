@@ -16,38 +16,30 @@ namespace MovieManagerAPI.Controllers
 {
     [ApiController]
     [Route("api/{controller}")]
-    public class ActoresController : ControllerBase
+    public class ActoresController : CustomBaseController
     {
         private readonly ApplicationDBContext context;
         private readonly IMapper mapper;
         private readonly IAlmacenadorArchivos almacenadorArchivos;
         private readonly string contenedor = "actores";
 
-        public ActoresController(ApplicationDBContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos)
+        public ActoresController(ApplicationDBContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos):base(context, mapper)
         {
             this.context = context;
             this.mapper = mapper;
             this.almacenadorArchivos = almacenadorArchivos;
-        }
+        } 
 
         [HttpGet]
         public async Task<ActionResult<List<ActorDTO>>> Get([FromQuery] PaginacionDTO paginacionDTO)
         {
-            var queryable = context.Actores.AsQueryable();
-            await HttpContext.InsertarParametrosPaginacion(queryable, paginacionDTO.CantidadRegistrosPorPagina);
-            var actores = await queryable.Paginar(paginacionDTO).ToListAsync();
-            return mapper.Map<List<ActorDTO>>(actores);
+            return await Get<Actor, ActorDTO>(paginacionDTO);
         }
 
         [HttpGet("{id:int}", Name = "obtenerActor")]
         public async Task<ActionResult<ActorDTO>> Get(int id)
         {
-            var existe = await context.Actores.AnyAsync(x => x.Id == id);
-            if (!existe)
-                return NotFound("El actor solicitado no existe");
-
-            var actor = await context.Actores.FirstOrDefaultAsync(x => x.Id == id);
-            return mapper.Map<ActorDTO>(actor);
+            return await Get<Actor, ActorDTO>(id);
         }
 
         [HttpPost]
@@ -100,38 +92,13 @@ namespace MovieManagerAPI.Controllers
         [HttpPatch("{id:int}")]
         public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<ActorPatchDTO> patchDocument)
         {
-            if (patchDocument == null)
-                return BadRequest();
-
-            var actor = await context.Actores.FirstOrDefaultAsync(x => x.Id == id);
-
-            if (actor == null)
-                return NotFound();
-
-            var actorDTO = mapper.Map<ActorPatchDTO>(actor);
-
-            patchDocument.ApplyTo(actorDTO, ModelState);
-
-            var esValido = TryValidateModel(actorDTO);
-            if (!esValido)
-                return BadRequest(ModelState);
-
-            mapper.Map(actorDTO, actor);
-
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await Patch<Actor, ActorPatchDTO>(id, patchDocument);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var existe = await context.Actores.AnyAsync(x => x.Id == id);
-            if (!existe)
-                return NotFound("El actor solicitado no existe");
-
-            context.Actores.Remove(new Actor { Id = id });
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await Delete<Actor>(id);
         }
     }
 }

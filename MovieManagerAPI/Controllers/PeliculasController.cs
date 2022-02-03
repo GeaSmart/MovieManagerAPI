@@ -18,7 +18,7 @@ namespace MovieManagerAPI.Controllers
 {
     [ApiController]
     [Route("api/{controller}")]
-    public class PeliculasController:ControllerBase
+    public class PeliculasController:CustomBaseController
     {
         private readonly ApplicationDBContext context;
         private readonly IMapper mapper;
@@ -26,7 +26,7 @@ namespace MovieManagerAPI.Controllers
         private readonly ILogger<PeliculasController> logger;
         private readonly string contenedor = "peliculas";
 
-        public PeliculasController(ApplicationDBContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos,ILogger<PeliculasController> logger)
+        public PeliculasController(ApplicationDBContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos,ILogger<PeliculasController> logger):base(context,mapper)
         {
             this.context = context;
             this.mapper = mapper;
@@ -182,38 +182,13 @@ namespace MovieManagerAPI.Controllers
         [HttpPatch("{id:int}")]
         public async Task<ActionResult> Patch(int id, [FromBody]JsonPatchDocument<PeliculaPatchDTO> patchDocument)
         {
-            if (patchDocument == null)
-                return BadRequest();
-
-            var pelicula = await context.Peliculas.FirstOrDefaultAsync(x => x.Id == id);
-
-            if (pelicula == null)
-                return NotFound();
-
-            var peliculaDTO = mapper.Map<PeliculaPatchDTO>(pelicula);
-
-            patchDocument.ApplyTo(peliculaDTO, ModelState);
-
-            var esValido = TryValidateModel(peliculaDTO);
-            if (!esValido)
-                return BadRequest(ModelState);
-
-            mapper.Map(peliculaDTO, pelicula);
-
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await Patch<Pelicula, PeliculaPatchDTO>(id, patchDocument);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var existe = await context.Peliculas.AnyAsync(x => x.Id == id);
-            if (!existe)
-                return NotFound();
-
-            context.Peliculas.Remove(new Pelicula { Id = id });
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await Delete<Pelicula>(id);
         }
     }
 }
