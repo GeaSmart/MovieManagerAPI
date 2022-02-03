@@ -14,13 +14,9 @@ namespace MovieManagerAPI.Controllers
     [Route("api/{controller}")]
     public class GenerosController:CustomBaseController //ControllerBase
     {
-        private readonly ApplicationDBContext context;
-        private readonly IMapper mapper;
-
         public GenerosController(ApplicationDBContext context, IMapper mapper) : base(context, mapper)
         {
-            this.context = context;
-            this.mapper = mapper;
+
         }
 
         [HttpGet]
@@ -40,38 +36,19 @@ namespace MovieManagerAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] GeneroCreacionDTO generoCreacionDTO)
         {
-            var genero = mapper.Map<Genero>(generoCreacionDTO);
-            await context.Generos.AddAsync(genero);
-            await context.SaveChangesAsync();
-
-            var generoDTO = mapper.Map<GeneroDTO>(genero);
-            return new CreatedAtRouteResult("obtenerGenero", new { id = generoDTO.Id }, generoDTO);
+            return await Post<GeneroCreacionDTO, Genero, GeneroDTO>(generoCreacionDTO, "obtenerGenero");
         }
 
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromBody] GeneroCreacionDTO generoCreacionDTO)
         {
-            var existe = await context.Generos.AnyAsync(x => x.Id == id);
-            if (!existe)
-                return NotFound("El genero indicado no existe");
-
-            var genero = mapper.Map<Genero>(generoCreacionDTO);
-            genero.Id = id;
-            context.Generos.Update(genero);
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await Put<GeneroCreacionDTO, Genero>(id, generoCreacionDTO);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var existe = await context.Generos.AnyAsync(x=>x.Id == id);
-            if (!existe)
-                return NotFound("El genero indicado no existe");
-
-            context.Generos.Remove(new Genero { Id = id });
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await Delete<Genero>(id);
         }
 
     }
