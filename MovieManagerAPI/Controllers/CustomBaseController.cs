@@ -46,7 +46,7 @@ namespace MovieManagerAPI.Controllers
             return mapper.Map<TDTO>(entidad);
         }
 
-        protected async Task<ActionResult> Post<TCreacion, TEntidad, TLectura>([FromBody] TCreacion creacionDTO, string nombreRuta) where TEntidad : class, IId
+        protected async Task<ActionResult> Post<TCreacion, TEntidad, TLectura>(TCreacion creacionDTO, string nombreRuta) where TEntidad : class, IId
         {
             var entidad = mapper.Map<TEntidad>(creacionDTO);
             await context.AddAsync(entidad);
@@ -56,7 +56,7 @@ namespace MovieManagerAPI.Controllers
             return new CreatedAtRouteResult(nombreRuta, new { id = entidad.Id }, dtoLectura);
         }
 
-        protected async Task<ActionResult> Put<TCreacion, TEntidad>(int id, [FromBody] TCreacion creacionDTO) where TEntidad:class,IId
+        protected async Task<ActionResult> Put<TCreacion, TEntidad>(int id, TCreacion creacionDTO) where TEntidad:class,IId
         {
             var existe = await context.Set<TEntidad>().AnyAsync(x => x.Id == id);
             if (!existe)
@@ -69,7 +69,7 @@ namespace MovieManagerAPI.Controllers
             return NoContent();
         }
 
-        protected async Task<ActionResult> Patch<TEntidad, TDTO>(int id, [FromBody] JsonPatchDocument<TDTO> patchDocument) 
+        protected async Task<ActionResult> Patch<TEntidad, TDTO>(int id, JsonPatchDocument<TDTO> patchDocument) 
             where TDTO:class
             where TEntidad: class, IId
         {
