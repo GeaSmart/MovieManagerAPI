@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -7,7 +8,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MovieManagerAPI.Helpers;
 using MovieManagerAPI.Servicios;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,8 +37,20 @@ namespace MovieManagerAPI
             //services.AddTransient<IAlmacenadorArchivos, AlmacenadorArchivosLocal>();
             //services.AddHttpContextAccessor();
 
+            //Configuracion del geometry factory
+            services.AddSingleton<GeometryFactory>(NtsGeometryServices.Instance.CreateGeometryFactory(srid:4326));//4326 indica coordenadas terrestres
+            services.AddSingleton(provider => 
+                new MapperConfiguration(config =>
+                {
+                    var geometryFactory = provider.GetRequiredService<GeometryFactory>();
+                    config.AddProfile(new AutoMapperProfiles(geometryFactory));
+                }).CreateMapper()
+            ) ;
+
             services.AddDbContext<ApplicationDBContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"))
+                options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"),
+                sqlServerOptions => sqlServerOptions.UseNetTopologySuite()
+                )
             );
 
             services.AddControllers()

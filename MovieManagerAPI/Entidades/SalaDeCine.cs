@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetTopologySuite.Geometries;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace MovieManagerAPI.Entidades
         [Required]
         [StringLength(120)]
         public string Nombre { get; set; }
+        public Point Ubicacion { get; set; }
 
         //Propiedades de navegacion
         public List<PeliculasSalasDeCine> PeliculasSalasDeCines { get; set; }        
