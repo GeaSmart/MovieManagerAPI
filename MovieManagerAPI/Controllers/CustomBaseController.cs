@@ -29,7 +29,7 @@ namespace MovieManagerAPI.Controllers
             return mapper.Map<List<TDTO>>(entidades);
         }
 
-        protected async Task<List<TDTO>> Get<TEntidad,TDTO>(PaginacionDTO paginacionDTO) where TEntidad: class, IId
+        protected async Task<List<TDTO>> Get<TEntidad,TDTO>(PaginacionDTO paginacionDTO) where TEntidad: class
         {
             var queryable = context.Set<TEntidad>().AsQueryable();
             await HttpContext.InsertarParametrosPaginacion(queryable, paginacionDTO.CantidadRegistrosPorPagina);
