@@ -23,6 +23,8 @@ namespace MovieManagerAPI
             modelBuilder.Entity<PeliculasActores>().HasKey(x => new { x.PeliculaId, x.ActorId });
             modelBuilder.Entity<PeliculasSalasDeCine>().HasKey(x => new { x.PeliculaId, x.SalaDeCineId });
 
+            SeedData(modelBuilder);
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -65,15 +67,15 @@ namespace MovieManagerAPI
             };
 
             //Insertando data
-            modelBuilder.Entity<IdentityUser>().HasData(usuarioAdmin);
-            modelBuilder.Entity<IdentityRole>().HasData(rolAdmin);
-            modelBuilder.Entity<IdentityUserClaim<string>>().HasData(new IdentityUserClaim<string>()
-            {
-                Id = 1,
-                ClaimType = ClaimTypes.Role,
-                UserId = usuarioAdminId,
-                ClaimValue = "Admin"
-            });
+            //modelBuilder.Entity<IdentityRole>().HasData(rolAdmin);
+            //modelBuilder.Entity<IdentityUser>().HasData(usuarioAdmin);            
+            //modelBuilder.Entity<IdentityUserClaim<string>>().HasData(new IdentityUserClaim<string>()
+            //{
+            //    Id = 1,
+            //    ClaimType = ClaimTypes.Role,
+            //    UserId = usuarioAdminId,
+            //    ClaimValue = "Admin"
+            //});
 
         }
     }
