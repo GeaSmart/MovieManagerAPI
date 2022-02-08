@@ -41,6 +41,8 @@ namespace MovieManagerAPI
             //services.AddTransient<IAlmacenadorArchivos, AlmacenadorArchivosLocal>();
             //services.AddHttpContextAccessor();
 
+            services.AddScoped<PeliculaExisteAttribute>();
+
             //Configuracion del geometry factory
             services.AddSingleton<GeometryFactory>(NtsGeometryServices.Instance.CreateGeometryFactory(srid:4326));//4326 indica coordenadas terrestres
             services.AddSingleton(provider => 

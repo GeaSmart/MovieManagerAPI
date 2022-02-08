@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieManagerAPI.DTO;
 using MovieManagerAPI.Entidades;
+using MovieManagerAPI.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace MovieManagerAPI.Controllers
 {
     [ApiController]
     [Route("api/peliculas/{peliculaId:int}/reviews")]
+    [ServiceFilter(typeof(PeliculaExisteAttribute))]
     public class ReviewsController:CustomBaseController
     {
         private readonly ApplicationDBContext context;
