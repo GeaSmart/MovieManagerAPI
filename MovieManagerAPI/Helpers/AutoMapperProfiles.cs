@@ -51,6 +51,7 @@ namespace MovieManagerAPI.Helpers
 
             CreateMap<Review, ReviewDTO>().ForMember(x => x.NombreUsuario, x => x.MapFrom(y => y.Usuario.UserName));
             CreateMap<ReviewDTO, Review>();
+            CreateMap<ReviewCreacionDTO, Review>();
         }
 
         private List<GeneroDTO> MapPeliculasGeneros(Pelicula pelicula, PeliculaDetallesDTO peliculaDetallesDTO)

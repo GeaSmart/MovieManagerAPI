@@ -60,7 +60,7 @@ namespace MovieManagerAPI.Controllers
             return NoContent();
         }
 
-        [HttpPut]
+        [HttpPut("{reviewId:int}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult> Put(int reviewId, [FromBody] ReviewCreacionDTO reviewCreacionDTO)
         {
