@@ -35,7 +35,7 @@ namespace MovieManagerAPI
         public DbSet<PeliculasActores> PeliculasActores { get; set; }
         public DbSet<SalaDeCine> SalasDeCine { get; set; }
         public DbSet<PeliculasSalasDeCine> PeliculasSalasDeCine { get; set; }
-
+        public DbSet<Review> Reviews { get; set; }
 
         private void SeedData(ModelBuilder modelBuilder)
         {
