@@ -29,6 +29,8 @@ namespace MovieManagerAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ReviewDTO>>> Get(int peliculaId, [FromQuery] PaginacionDTO paginacionDTO)
         {
+            //Aquí podríamos validar si la película existe, pero lo haremos mejor a través de los filtros
+
             var queryable = context.Reviews.Include(x => x.Usuario).Where(x => x.PeliculaId == peliculaId).AsQueryable();            
             return await Get<Review, ReviewDTO>(paginacionDTO, queryable);
         }
