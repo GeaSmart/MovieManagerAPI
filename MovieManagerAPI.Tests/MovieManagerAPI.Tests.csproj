@@ -15,11 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="PruebasUnitarias\" />
-    <Folder Include="PruebasUnitarias\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\MovieManagerAPI\MovieManagerAPI.csproj" />
   </ItemGroup>
 
