@@ -45,10 +45,10 @@ namespace MovieManagerAPI.Controllers
         protected async Task<ActionResult<TDTO>> Get<TEntidad, TDTO>(int id) where TEntidad : class, IId
         {
             var entidad = await context.Set<TEntidad>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-            if (entidad == null)
-                return NotFound("No se encontró la información solicitada");
+            if (entidad == null)                
+                return NotFound();
 
-            return mapper.Map<TDTO>(entidad);
+            return mapper.Map<TDTO>(entidad);            
         }
 
         protected async Task<ActionResult> Post<TCreacion, TEntidad, TLectura>(TCreacion creacionDTO, string nombreRuta) where TEntidad : class, IId

@@ -30,7 +30,7 @@ namespace MovieManagerAPI.Controllers
         [HttpGet("{id:int}", Name = "obtenerGenero")]
         public async Task<ActionResult<GeneroDTO>> Get(int id)
         {
-            return await Get<Genero, GeneroDTO>(id);
+            return await Get<Genero, GeneroDTO>(id);            
         }
 
         [HttpPost]

@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MovieManagerAPI.Controllers;
 using MovieManagerAPI.Entidades;
 using System;
@@ -33,6 +34,23 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
             //Verificación
             var generos = respuesta.Value;
             Assert.AreEqual(2, generos.Count);
+        }
+
+        [TestMethod]
+        public async Task ObtenerGeneroPorIdNoExistente()
+        {
+            //Preparación
+            var nombreBD = Guid.NewGuid().ToString();
+            var contexto = ConstruirContext(nombreBD);
+            var mapper = ConfigurarAutomapper();
+
+            //Prueba
+            var controlador = new GenerosController(contexto, mapper);
+            var respuesta = await controlador.Get(1);
+
+            //Verificación
+            var resultado = respuesta.Result as StatusCodeResult;
+            Assert.AreEqual(404, resultado.StatusCode);
         }
     }
 }
