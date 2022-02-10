@@ -24,16 +24,15 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
             contexto.Generos.Add(new Genero { Nombre = "género 2" });
             await contexto.SaveChangesAsync();
 
-            var contexto2 = ConstruirContext(nombreBD);
+            var contexto2 = ConstruirContext(nombreBD); //creamos otro contexto para asegurarnos que la información viene de la bd y no de la variable contexto, es decir en memoria
 
             //Prueba
             var controlador = new GenerosController(contexto2, mapper);
             var respuesta = await controlador.Get();
 
             //Verificación
-            var generos = respuesta;
+            var generos = respuesta.Value;
             Assert.AreEqual(2, generos.Count);
-
         }
     }
 }

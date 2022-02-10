@@ -20,7 +20,7 @@ namespace MovieManagerAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<List<GeneroDTO>> Get()
+        public async Task<ActionResult<List<GeneroDTO>>> Get()
         {
             //var generos = await context.Generos.ToListAsync();
             //return mapper.Map<List<GeneroDTO>>(generos);
