@@ -24,6 +24,7 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
 
             contexto.Actores.Add(new Actor { Nombre = "actor 1" });
             contexto.Actores.Add(new Actor { Nombre = "actor 2" });
+            contexto.Actores.Add(new Actor { Nombre = "actor 3" });
             await contexto.SaveChangesAsync();
 
             var contexto2 = ConstruirContext(nombreBD);
@@ -38,7 +39,18 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
 
             //Verificación
             var actores = respuesta.Value;
-            Assert.AreEqual(2, actores.Count);
+            Assert.AreEqual(3, actores.Count);
+
+
+            controlador.ControllerContext.HttpContext = new DefaultHttpContext();
+            var paginacionDTO2 = new PaginacionDTO() { CantidadRegistrosPorPagina = 2, Pagina = 2 };
+            var respuesta2 = await controlador.Get(paginacionDTO2);
+
+            //Verificación
+            var actores2 = respuesta2.Value;
+            Assert.AreEqual(1, actores2.Count);
         }
+
+        
     }
 }
