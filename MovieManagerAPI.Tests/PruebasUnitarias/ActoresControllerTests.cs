@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -126,6 +127,27 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
             //Assert.IsNull(listado[0].Foto);
             Assert.AreEqual("url", listado[0].Foto);
             Assert.AreEqual(1, mock.Invocations.Count);
+
+        }
+
+        [TestMethod]
+        public async Task PatchRetorna404SiActorNoExiste()
+        {
+            var nombreBD = Guid.NewGuid().ToString();
+            var contexto = ConstruirContext(nombreBD);
+            var mapper = ConfigurarAutomapper();
+
+            var controller = new ActoresController(contexto, mapper, null);
+            var patchDoc = new JsonPatchDocument<ActorPatchDTO>();
+            var respuesta = await controller.Patch(1, patchDoc);
+            var resultado = respuesta as StatusCodeResult;
+
+            Assert.AreEqual(404, resultado.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task PatchActualizaUnSoloCampo()
+        {
 
         }
 
