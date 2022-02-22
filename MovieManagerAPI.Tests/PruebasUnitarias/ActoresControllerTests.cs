@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using MovieManagerAPI.Controllers;
 using MovieManagerAPI.DTO;
 using MovieManagerAPI.Entidades;
+using MovieManagerAPI.Servicios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,6 +64,37 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
             Assert.AreEqual(0, actores3.Count);
         }
 
-        
+        [TestMethod]
+        public async Task CrearActorSinFoto()
+        {
+            var nombreBD = Guid.NewGuid().ToString();
+            var contexto = ConstruirContext(nombreBD);
+            var mapper = ConfigurarAutomapper();
+
+            var actor = new ActorCreacionDTO { Nombre = "Gerson", FechaNacimiento = DateTime.Now };
+
+            //para trabajar con el IAlmacenadorArchivos
+            var mock = new Mock<IAlmacenadorArchivos>();
+            mock.Setup(x => x.GuardarArchivo(null, null, null, null)).Returns(Task.FromResult("url"));
+
+            var controller = new ActoresController(contexto, mapper, mock.Object);
+
+            var respuesta = await controller.Post(actor);
+            var resultado = respuesta as CreatedAtRouteResult;
+            Assert.AreEqual(201, resultado.StatusCode);
+
+            var contexto2 = ConstruirContext(nombreBD);
+            var listado = await contexto2.Actores.ToListAsync();
+            Assert.AreEqual(1, listado.Count);
+            Assert.IsNull(listado[0].Foto);
+            Assert.AreEqual(0,mock.Invocations.Count);
+        }
+
+        [TestMethod]
+        public async Task CrearActorConFoto()
+        {
+
+        }
+
     }
 }
