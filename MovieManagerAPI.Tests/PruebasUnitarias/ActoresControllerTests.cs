@@ -9,6 +9,7 @@ using MovieManagerAPI.Entidades;
 using MovieManagerAPI.Servicios;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -93,6 +94,38 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
         [TestMethod]
         public async Task CrearActorConFoto()
         {
+            var nombreBD = Guid.NewGuid().ToString();
+            var contexto = ConstruirContext(nombreBD);
+            var mapper = ConfigurarAutomapper();
+
+            var content = Encoding.UTF8.GetBytes("Imagen de prueba");
+            var archivo = new FormFile(new MemoryStream(content), 0, content.Length, "Data", "imagen.jpg");
+            archivo.Headers = new HeaderDictionary();
+            archivo.ContentType = "image/jpg";
+
+            var actor = new ActorCreacionDTO()
+            {
+                Nombre = "nuevo actor",
+                FechaNacimiento = DateTime.Now,
+                Foto = archivo
+            };
+
+            //para trabajar con el IAlmacenadorArchivos
+            var mock = new Mock<IAlmacenadorArchivos>();
+            mock.Setup(x => x.GuardarArchivo(content, ".jpg", "actores", archivo.ContentType)).Returns(Task.FromResult("url"));
+
+            var controller = new ActoresController(contexto, mapper, mock.Object);
+
+            var respuesta = await controller.Post(actor);
+            var resultado = respuesta as CreatedAtRouteResult;
+            Assert.AreEqual(201, resultado.StatusCode);
+
+            var contexto2 = ConstruirContext(nombreBD);
+            var listado = await contexto2.Actores.ToListAsync();
+            Assert.AreEqual(1, listado.Count);
+            //Assert.IsNull(listado[0].Foto);
+            Assert.AreEqual("url", listado[0].Foto);
+            Assert.AreEqual(1, mock.Invocations.Count);
 
         }
 
