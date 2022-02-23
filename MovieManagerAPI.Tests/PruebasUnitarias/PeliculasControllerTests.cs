@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using MovieManagerAPI.Controllers;
 using MovieManagerAPI.DTO;
 using MovieManagerAPI.Entidades;
@@ -216,6 +218,35 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
 
                 Assert.AreEqual(peliculaDB.Id, peliculaFiltrada.Id);//verificamos que ambos listados tengan el mismo orden
             }
+        }
+
+        [TestMethod]
+        public async Task FiltrarPorCampoIncorrectoDevuelvePeliculas()
+        {
+            var nombreBD = CrearDataPrueba();
+            var mapper = ConfigurarAutomapper();
+            var contexto = ConstruirContext(nombreBD);
+
+            var mock = new Mock<ILogger<PeliculasController>>();
+            
+            var controller = new PeliculasController(contexto, mapper, null, mock.Object);
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+
+            var filtroDTO = new PeliculasFiltroDTO()
+            {
+                CampoOrdenar = "noexisteestecampo",
+                IsAscendente = true
+            };
+
+            var respuesta = await controller.Filtrar(filtroDTO);
+            var peliculas = respuesta.Value;
+
+            var contexto2 = ConstruirContext(nombreBD);
+            var peliculasDB = contexto2.Peliculas.ToList();
+
+            //verificación
+            Assert.AreEqual(peliculasDB.Count, peliculas.Count);
+            Assert.AreEqual(1, mock.Invocations.Count);
         }
     }
 }
