@@ -31,7 +31,7 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
 
             var peliculaConGenero = new Pelicula()
             {
-                Titulo = "Generación millenial",
+                Titulo = "Jonas",
                 FechaEstreno = new DateTime(2022, 02, 02),
                 EnCines = false
             };
@@ -98,7 +98,90 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
             Assert.AreEqual(2, peliculas.Count);//porque al crear la data ingresé 2 peliculas en cine.
             Assert.AreEqual(enCines, peliculas[0].EnCines);
             Assert.AreEqual("Gol", peliculas[0].Titulo);//la primera peli en cine se llama así
+        }
 
+        [TestMethod]
+        public async Task FiltrarProximosEstrenos()
+        {
+            var nombreBD = CrearDataPrueba();
+            var mapper = ConfigurarAutomapper();
+            var contexto = ConstruirContext(nombreBD);
+
+            var controller = new PeliculasController(contexto, mapper, null, null);
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+
+            var proximosEstrenos = true;
+            var filtroDTO = new PeliculasFiltroDTO()
+            {
+                ProximosEstrenos = proximosEstrenos,
+                CantidadRegistrosPorPagina = 10
+            };
+
+            var respuesta = await controller.Filtrar(filtroDTO);
+            var peliculas = respuesta.Value;
+
+            //verificación
+            Assert.AreEqual(1, peliculas.Count);//porque al crear la data ingresé 1 pelicula para prox estreno.            
+            Assert.AreEqual("Gol", peliculas[0].Titulo);//la primera peli para proximo estreno se llama así
+        }
+
+        [TestMethod]
+        public async Task FiltrarPeliculaConGenero()
+        {
+            var nombreBD = CrearDataPrueba();
+            var mapper = ConfigurarAutomapper();
+            var contexto = ConstruirContext(nombreBD);
+
+            var controller = new PeliculasController(contexto, mapper, null, null);
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+
+            var generoId = contexto.Generos.Select(x => x.Id).First();
+
+            var filtroDTO = new PeliculasFiltroDTO()
+            {
+                GeneroId = generoId
+            };
+
+            var respuesta = await controller.Filtrar(filtroDTO);
+            var peliculas = respuesta.Value;
+
+            //verificación
+            Assert.AreEqual(1, peliculas.Count);//porque al crear la data ingresé 1 pelicula con genero.            
+            Assert.AreEqual("Jonas", peliculas[0].Titulo);//la primera peli con género se llama así
+        }
+
+        [TestMethod]
+        public async Task FiltrarOrdenaTitulosAscendente()
+        {
+            var nombreBD = CrearDataPrueba();
+            var mapper = ConfigurarAutomapper();
+            var contexto = ConstruirContext(nombreBD);
+
+            var controller = new PeliculasController(contexto, mapper, null, null);
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            
+            var filtroDTO = new PeliculasFiltroDTO()
+            {
+                CampoOrdenar = "titulo",
+                IsAscendente = true
+            };
+
+            var respuesta = await controller.Filtrar(filtroDTO);
+            var peliculas = respuesta.Value;
+
+            var contexto2 = ConstruirContext(nombreBD);
+            var peliculasDB = contexto2.Peliculas.OrderBy(x => x.Titulo).ToList();
+
+            //verificación
+            Assert.AreEqual(peliculasDB.Count, peliculas.Count);
+            
+            for(int i = 0; i < peliculasDB.Count; i++)
+            {
+                var peliculaFiltrada = peliculas[i];
+                var peliculaDB = peliculasDB[i];
+
+                Assert.AreEqual(peliculaDB.Id, peliculaFiltrada.Id);//verificamos que ambos listados tengan el mismo orden
+            }                        
         }
     }
 }
