@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MovieManagerAPI.Controllers;
 using MovieManagerAPI.DTO;
 using MovieManagerAPI.Entidades;
@@ -53,12 +54,12 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
         {
             var nombreBD = CrearDataPrueba();
             var mapper = ConfigurarAutomapper();
-
             var contexto = ConstruirContext(nombreBD);
 
             var controller = new PeliculasController(contexto, mapper, null, null);
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
 
-            var tituloPelicula = "Peli 1";
+            var tituloPelicula = "Gol";
             var filtroDTO = new PeliculasFiltroDTO()
             {
                 Titulo = tituloPelicula,
@@ -69,8 +70,35 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
             var peliculas = respuesta.Value;
 
             //verificación
-            Assert.AreEqual(1, peliculas.Count);
+            Assert.AreEqual(1, peliculas.Count);//ingresé en la data de prueba una peli titulada así
             Assert.AreEqual(tituloPelicula, peliculas[0].Titulo);
+        }
+
+        [TestMethod]
+        public async Task FiltrarEnCines()
+        {
+            var nombreBD = CrearDataPrueba();
+            var mapper = ConfigurarAutomapper();
+            var contexto = ConstruirContext(nombreBD);
+
+            var controller = new PeliculasController(contexto, mapper, null, null);
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+
+            var enCines = true;
+            var filtroDTO = new PeliculasFiltroDTO()
+            {
+                EnCines = enCines,
+                CantidadRegistrosPorPagina = 10
+            };
+
+            var respuesta = await controller.Filtrar(filtroDTO);
+            var peliculas = respuesta.Value;
+
+            //verificación
+            Assert.AreEqual(2, peliculas.Count);//porque al crear la data ingresé 2 peliculas en cine.
+            Assert.AreEqual(enCines, peliculas[0].EnCines);
+            Assert.AreEqual("Gol", peliculas[0].Titulo);//la primera peli en cine se llama así
+
         }
     }
 }
