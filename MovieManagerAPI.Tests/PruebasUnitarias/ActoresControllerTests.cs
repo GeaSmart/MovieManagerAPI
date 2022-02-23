@@ -89,6 +89,8 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
 
             var contexto2 = ConstruirContext(nombreBD);
             var listado = await contexto2.Actores.ToListAsync();
+
+            //verificación
             Assert.AreEqual(1, listado.Count);
             Assert.IsNull(listado[0].Foto);
             Assert.AreEqual(0,mock.Invocations.Count);
@@ -125,6 +127,8 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
 
             var contexto2 = ConstruirContext(nombreBD);
             var listado = await contexto2.Actores.ToListAsync();
+
+            //verificación
             Assert.AreEqual(1, listado.Count);
             //Assert.IsNull(listado[0].Foto);
             Assert.AreEqual("url", listado[0].Foto);
@@ -144,6 +148,7 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
             var respuesta = await controller.Patch(1, patchDoc);
             var resultado = respuesta as StatusCodeResult;
 
+            //verificación
             Assert.AreEqual(404, resultado.StatusCode);
         }
 
@@ -176,10 +181,13 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
             patchDocument.Operations.Add(new Operation<ActorPatchDTO>("replace", "/nombre", null, "Claudia"));
             var respuesta = await controller.Patch(1,patchDocument);
             var resultado = respuesta as StatusCodeResult;
+
+            //verificación
             Assert.AreEqual(204, resultado.StatusCode);
 
             var contexto3 = ConstruirContext(nombreBD);
             var actorBD = await contexto3.Actores.FirstAsync();
+                        
             Assert.AreEqual("Claudia", actorBD.Nombre);
             Assert.AreEqual(fechaNacimiento, actorBD.FechaNacimiento);
         }
