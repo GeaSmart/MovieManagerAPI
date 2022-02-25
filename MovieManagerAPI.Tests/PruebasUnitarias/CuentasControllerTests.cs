@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using MovieManagerAPI.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +25,37 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
 
         }
 
+        private CuentasController ConstruirCuentasController(string nombreBD)
+        {
+            var context = ConstruirContext(nombreBD);
+            var miUserStore = new UserStore<IdentityUser>(context);
+            var userManager = BuildUserManager(miUserStore);
+            var mapper = ConfigurarAutomapper();
+
+            var httpContext = new DefaultHttpContext();
+            MockAuth(httpContext);
+            var signInManager = SetupSignInManager(userManager, httpContext);
+
+            var miConfiguracion = new Dictionary<string, string>
+            {
+                {"JWT:key", "ASDJKNKJN4KJ5N4KJSNDKAJSNDAKSJDNK4J5N43KJ53N4KSNDJASKLDNAS" }
+            };
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(miConfiguracion)
+                .Build();
+
+            return new CuentasController(userManager, signInManager, configuration, context, mapper);
+        }
+
+        private Mock<IAuthenticationService> MockAuth(HttpContext context)
+        {
+            var auth = new Mock<IAuthenticationService>();
+            context.RequestServices = new ServiceCollection().AddSingleton(auth.Object).BuildServiceProvider();
+            return auth;
+        }
+
+        /* ++++++++++ STANDARD METHODS FROM DOT NET ++++++++++*/
         // Source: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/test/Shared/MockHelpers.cs
         // Source: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/test/Identity.Test/SignInManagerTest.cs
         // Some code was modified to be adapted to our project.
@@ -69,13 +103,6 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
             var sm = new SignInManager<TUser>(manager, contextAccessor.Object, claimsFactory, options.Object, null, schemeProvider, new DefaultUserConfirmation<TUser>());
             sm.Logger = logger ?? (new Mock<ILogger<SignInManager<TUser>>>()).Object;
             return sm;
-        }
-
-        private Mock<IAuthenticationService> MockAuth(HttpContext context)
-        {
-            var auth = new Mock<IAuthenticationService>();
-            context.RequestServices = new ServiceCollection().AddSingleton(auth.Object).BuildServiceProvider();
-            return auth;
         }
 
     }
