@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using MovieManagerAPI.Controllers;
+using MovieManagerAPI.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +20,58 @@ using System.Threading.Tasks;
 
 namespace MovieManagerAPI.Tests.PruebasUnitarias
 {
+    [TestClass]
     public class CuentasControllerTests : BasePruebas
     {
         [TestMethod]
         public async Task CrearUsuario()
         {
+            var nombreBD = Guid.NewGuid().ToString();
+            await CrearUsuarioHelper(nombreBD);
 
+            var contexto2 = ConstruirContext(nombreBD);
+            var conteo = await contexto2.Users.CountAsync();
+            Assert.AreEqual(1, conteo);
+        }
+
+        [TestMethod]
+        public async Task UsuarioNoPuedeLoguearse()
+        {
+            var nombreBD = Guid.NewGuid().ToString();
+            await CrearUsuarioHelper(nombreBD);
+
+            var controller = ConstruirCuentasController(nombreBD);
+            var userInfo = new UserInfo() { Email = "ejemplo@ejemplo.com", Password = "password-equivocado" };
+
+            var respuesta = await controller.Login(userInfo);
+
+            Assert.IsNull(respuesta.Value);
+            var resultado = respuesta.Result as BadRequestObjectResult;
+
+            Assert.IsNotNull(resultado);
+        }
+
+        [TestMethod]
+        public async Task UsuarioPuedeLoguearse()
+        {
+            var nombreBD = Guid.NewGuid().ToString();
+            await CrearUsuarioHelper(nombreBD);
+
+            var controller = ConstruirCuentasController(nombreBD);
+            var userInfo = new UserInfo() { Email = "ejemplo@ejemplo.com", Password = "Aa123456!" };
+
+            var respuesta = await controller.Login(userInfo);
+
+            Assert.IsNotNull(respuesta.Value);
+            Assert.IsNotNull(respuesta.Value.Token);
+        }
+
+        //métodos auxiliares
+        public async Task CrearUsuarioHelper(string nombreBD)
+        {
+            var cuentasController = ConstruirCuentasController(nombreBD);
+            var userInfo = new UserInfo() { Email = "ejemplo@ejemplo.com", Password = "Aa123456!" };//la contraseña debe cumplir politicas, sino no crea el usuario
+            await cuentasController.Registrar(userInfo);
         }
 
         private CuentasController ConstruirCuentasController(string nombreBD)
@@ -38,8 +87,8 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
 
             var miConfiguracion = new Dictionary<string, string>
             {
-                {"JWT:key", "ASDJKNKJN4KJ5N4KJSNDKAJSNDAKSJDNK4J5N43KJ53N4KSNDJASKLDNAS" }
-            };
+                {"JWT:key", "FSD1ADF6GH1FG1RT814UYTNMVBR1IOUP1K16HF1W1SFD1H6N8G6FD1J8QREHPIUG61JGD16GFDJA1FGDSDFJJK33I1JU8I1DG00" }
+            };//el mismo key que está en appsettings.Development.json, aunque no es obligatorio que sea el mismo.
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(miConfiguracion)
