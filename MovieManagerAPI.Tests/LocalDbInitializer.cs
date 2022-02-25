@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MovieManagerAPI.Tests
 {
-    [TestClass]
+    //[TestClass]
     public class LocalDbInitializer
     {
         private static readonly string _dbName = "PruebasDeIntegracion";
