@@ -16,26 +16,13 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
     public class SalasDeCineControllerTests : BasePruebas
     {
         [TestMethod]
-        public async Task ObtenerSalasDeCine5km()
+        public async Task ObtenerSalasDeCine1km()
         {
             var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
 
-            //creamos el contexto, pero no el de basepruebas sino el de localdb ya que es en localdb donde estamos probando
-            using (var context = LocalDbInitializer.GetDbContextLocalDb(false))
-            {
-                var salasDeCine = new List<SalaDeCine>()
-                {
-                    new SalaDeCine{ Nombre = "Real plaza Trujillo", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-79.031337, -8.131762)) },//el primer numero es el segundo que aparece en google maps: longitud, el otro latitud
-                    new SalaDeCine{ Nombre = "Real plaza Lima", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-77.023628, -12.099039)) }
-                };
-
-                context.AddRange(salasDeCine);
-                await context.SaveChangesAsync();
-            }
-
             var filtro = new SalaDeCineCercanoFiltroDTO()
             {
-                DistanciaEnKms = 1505,
+                DistanciaEnKms = 1,
                 Latitud = -8.109588,
                 Longitud = -79.028108
             };
@@ -46,31 +33,40 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
                 var controller = new SalasDeCineController(context, mapper, geometryFactory);
                 var respuesta = await controller.Cercanos(filtro);
                 var valor = respuesta.Value;
-                Assert.AreEqual(1, valor.Count);
+                Assert.AreEqual(0, valor.Count);//A 1km no hay ninguno
+            }
+        }
+
+        [TestMethod]
+        public async Task ObtenerSalasDeCine5km()
+        {
+            var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
+
+            var filtro = new SalaDeCineCercanoFiltroDTO()
+            {
+                DistanciaEnKms = 5,
+                Latitud = -8.109588,
+                Longitud = -79.028108
+            };
+
+            using (var context = LocalDbInitializer.GetDbContextLocalDb(false))
+            {
+                var mapper = ConfigurarAutomapper();
+                var controller = new SalasDeCineController(context, mapper, geometryFactory);
+                var respuesta = await controller.Cercanos(filtro);
+                var valor = respuesta.Value;
+                Assert.AreEqual(1, valor.Count);//Solo Real Plaza Trujillo está a menos de 5km
             }
         }
 
         [TestMethod]
         public async Task ObtenerSalasDeCine500km()
         {
-            var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
-
-            //creamos el contexto, pero no el de basepruebas sino el de localdb ya que es en localdb donde estamos probando
-            using (var context = LocalDbInitializer.GetDbContextLocalDb(false))
-            {
-                var salasDeCine = new List<SalaDeCine>()
-                {
-                    new SalaDeCine{ Nombre = "Real plaza Trujillo", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-79.031337, -8.131762)) },//el primer numero es el segundo que aparece en google maps: longitud, el otro latitud
-                    new SalaDeCine{ Nombre = "Real plaza Lima", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-77.023628, -12.099039)) }
-                };
-
-                context.AddRange(salasDeCine);
-                await context.SaveChangesAsync();
-            }
+            var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);                       
 
             var filtro = new SalaDeCineCercanoFiltroDTO()
             {
-                DistanciaEnKms = 1505,
+                DistanciaEnKms = 500,
                 Latitud = -8.109588,
                 Longitud = -79.028108
             };
@@ -81,7 +77,7 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
                 var controller = new SalasDeCineController(context, mapper, geometryFactory);
                 var respuesta = await controller.Cercanos(filtro);
                 var valor = respuesta.Value;
-                Assert.AreEqual(2, valor.Count);
+                Assert.AreEqual(2, valor.Count);//Ambas están dentro de los 500km
             }
         }
     }
