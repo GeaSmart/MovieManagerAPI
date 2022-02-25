@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MovieManagerAPI.Tests
 {
-    //[TestClass]
+    [TestClass]
     public class LocalDbInitializer
     {
         private static readonly string _dbName = "PruebasDeIntegracion";
@@ -33,7 +33,7 @@ namespace MovieManagerAPI.Tests
         public static ApplicationDBContext GetDbContextLocalDb(bool beginTransaction = true)
         {
             var options = new DbContextOptionsBuilder<ApplicationDBContext>()
-                .UseSqlServer($"Data Source=(localdb)\\mssqllocaldb;Initial Catalog={_dbName};Integrated Security=True",
+                .UseSqlServer($"Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog={_dbName};Integrated Security=True",
                 x => x.UseNetTopologySuite())
                 .Options;
             var context = new ApplicationDBContext(options);
