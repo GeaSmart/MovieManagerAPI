@@ -9,7 +9,7 @@ namespace MovieManagerAPI.Tests
 {
     public class UsuarioFalsoFiltro : IAsyncActionFilter
     {
-        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next) //similar a como construimos contexto en basepruebas
         {
             context.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
                 new Claim(ClaimTypes.Name, "ejemplo@ejemplo.com"),
