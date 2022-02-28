@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace MovieManagerAPI.Tests.PruebasDeIntegracion
 {
+    [TestClass]
     public class GenerosControllerTests : BasePruebas
     {
         private static readonly string url = "/api/generos";
