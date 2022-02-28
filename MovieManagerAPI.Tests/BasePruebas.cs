@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using MovieManagerAPI.Helpers;
 using NetTopologySuite;
 using System;
@@ -44,6 +48,35 @@ namespace MovieManagerAPI.Tests
             }));
 
             return new ControllerContext() { HttpContext = new DefaultHttpContext() { User = usuario } };
+        }
+
+        //método auxiliar para construir peticiones http
+        protected WebApplicationFactory<Startup> ConstruirWebApplicationFactory(string nombreBD, bool ignorarSeguridad = true)
+        {
+            var factory = new WebApplicationFactory<Startup>();
+            factory = factory.WithWebHostBuilder(builder => {
+                builder.ConfigureTestServices(services => {
+                    var descriptorDBContext = services.SingleOrDefault( d => d.ServiceType == typeof(DbContextOptions<ApplicationDBContext>));
+
+                    if (descriptorDBContext != null)
+                        services.Remove(descriptorDBContext);
+
+                    services.AddDbContext<ApplicationDBContext>(options =>
+                        options.UseInMemoryDatabase(nombreBD)
+                    );
+
+                    if (ignorarSeguridad) //configuraremos un servicio y un filtro que nos ayudará a saltarnos la seguridad de asp.net core
+                    {
+                        services.AddSingleton<IAuthorizationHandler, AllowAnonymousHandler>();
+
+                        services.AddControllers(options =>
+                        {
+                            options.Filters.Add(new UsuarioFalsoFiltro());
+                        });
+                    }
+                });
+            });
+            return factory;
         }
     }
 }
