@@ -59,7 +59,9 @@ namespace MovieManagerAPI
                 )
             );
 
-            services.AddControllers()
+            services.AddControllers(options => {
+                options.Filters.Add(typeof(FiltroErrores));
+            })
                 .AddNewtonsoftJson();
 
             //Configuring identity
@@ -79,6 +81,7 @@ namespace MovieManagerAPI
                         ClockSkew = TimeSpan.Zero
                     }                        
                 );
+            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_CONNECTIONSTRING"]);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
