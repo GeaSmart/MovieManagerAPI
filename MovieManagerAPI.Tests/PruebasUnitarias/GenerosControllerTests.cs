@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MovieManagerAPI.Controllers;
@@ -51,7 +52,8 @@ namespace MovieManagerAPI.Tests.PruebasUnitarias
             var respuesta = await controlador.Get(1);
 
             //Verificación
-            var resultado = respuesta.Result as StatusCodeResult;
+            //var resultado = respuesta.Result as StatusCodeResult;
+            var resultado = respuesta.Result as IStatusCodeActionResult;//esto es mejor que usar el StatusCodeResult ya que funciona enviemos o no mensaje en el notfound
             Assert.AreEqual(404, resultado.StatusCode);
         }
 
